@@ -1,0 +1,49 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<div class="container">
+    <div class="row well">
+        <div class="col-md-12">
+            <h2>Add a New Ticket</h2>
+            <p>Title</p>
+            <input id="txtTitle" type="text" />
+            <p>Description</p>
+            <textarea id="txtDescription" cols="40" rows="5"></textarea>
+            <button id="btnAddTicket" class="btn btn-default">Add Ticket</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Current Tickets</h2>
+            <ul id="listCurrentTickets"></ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+
+    <script src="~/Scripts/jquery.signalR-2.0.3.js"></script>
+    <script src="~/SignalR/Hubs"></script>
+    <script>
+        var ticketHub = $.connection.helpTicketHub;
+        ticketHub.client.issueNewTicket = function (newTicket) {
+            var newElement = $("<li></li>").text(newTicket.Title);
+            $("#listCurrentTickets").append(newElement);
+
+        };
+
+        // Start the connection.
+        $.connection.hub.start().done(function () {
+            $('#btnAddTicket').click(function () {
+                ticketHub.server.addHelpTicket({
+                    title: $("#txtTitle").val(),
+                    description: $("#txtDescription").val()
+                });
+                var newElement = $("<li></li>").text($("#txtTitle").val());
+                $("#listCurrentTickets").append(newElement);
+            });
+        });
+
+    </script>
+}
